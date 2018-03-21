@@ -10,7 +10,15 @@ const { helpers, questionQueue, setQuestions } = require('../questions');
 
 //Register new users
 
+router.get('/allUsers', (req, res) => {
+  return User.find()
+    .then(allUsers => {
+      res.json(allUsers);
+    });
+});
+
 router.post('/', jsonParser, (req, res) => {
+  console.log("hey");
   const requiredFields = ['username', 'password'];
   const missingField = requiredFields.find(field => !(field in req.body));
   if (missingField) {
@@ -48,12 +56,15 @@ router.post('/', jsonParser, (req, res) => {
     username: {min: 1}, 
     password: {min: 7, max: 72}
   };
+
   const tooSmallField = Object.keys(sizedFields).find(
     field => 'min' in sizedFields[field] && req.body[field].trim().length < sizedFields[field].min
   );
+
   const tooLargeField = Object.keys(sizedFields).find(
     field => 'max' in sizedFields[field] && req.body[field].trim().length > sizedFields[field].max
   );
+
   if (tooSmallField || tooLargeField) {
     return res.status(422).json({
       code: 422,
